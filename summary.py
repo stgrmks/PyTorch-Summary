@@ -9,8 +9,8 @@ class summary(object):
         self.model = model.to(device)
         self.input_size = input_size
         self.device = device
-        self.summary = self.iterate()
-        if verbose: self.printer(summary = self.summary)
+        self.iterate()
+        if verbose: self.printer()
 
     def infere_output(self, input, layer):
         if isinstance(layer, torch.nn.Linear): input = input.resize(1, np.prod(input.shape[1:]))
@@ -40,9 +40,11 @@ class summary(object):
                     output = self.infere_output(input, layer)
                     summary.append([k, type(layer).__name__, tuple(input.shape)[1:], tuple(output.shape)[1:]] + self.compute_no_params(layer))
                     input = output
+        self.summary = summary
         return summary
 
-    def printer(self, summary):
+    def printer(self, summary = None):
+        if summary is None: summary = self.summary
         total_params, trainable_params = 0, 0
         print 'Model Summary'
         print '------------------------------------------------------------------------------------------------------------------------------'
