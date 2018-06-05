@@ -12,7 +12,7 @@ class summary(object):
         self.iterate()
         if verbose: self.printer()
 
-    def infere_output(self, input, layer):
+    def compute_output(self, input, layer):
         if isinstance(layer, torch.nn.Linear): input = input.resize(1, np.prod(input.shape[1:]))
         return layer(input)
 
@@ -32,12 +32,12 @@ class summary(object):
             for k, v in self.model._modules.iteritems():
                 if isinstance(v, torch.nn.Sequential):
                     for layer in v:
-                        output = self.infere_output(input, layer)
+                        output = self.compute_output(input, layer)
                         summary.append([k, type(layer).__name__, tuple(input.shape)[1:], tuple(output.shape)[1:]] + self.compute_no_params(layer))
                         input = output
                 else:
                     layer = v
-                    output = self.infere_output(input, layer)
+                    output = self.compute_output(input, layer)
                     summary.append([k, type(layer).__name__, tuple(input.shape)[1:], tuple(output.shape)[1:]] + self.compute_no_params(layer))
                     input = output
         self.summary = summary
